@@ -1,4 +1,4 @@
-module github.com/Jul3s7/rest-query-parser
+module github.com/Jul3s7/rest-query-parser/v2
 
 go 1.25.0
 
