@@ -4,6 +4,7 @@
 
 [![GoDoc](https://godoc.org/github.com/Jul3s7/rest-query-parser/v3?status.png)](https://godoc.org/github.com/Jul3s7/rest-query-parser/v3)
 [![Coverage Status](https://coveralls.io/repos/github/timsolov/rest-query-parser/badge.svg?branch=master)](https://coveralls.io/github/timsolov/rest-query-parser?branch=master)
+[![Ko-fi](https://img.shields.io/badge/Support-Ko--fi-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/danysz)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
 Query Parser is a library for easy building dynamic SQL queries to Database. It provides a simple API for web-applications which needs to do some filtering throught GET queries. It is a connector between the HTTP handler and the DB engine, and manages validations and translations for user inputs.
@@ -29,6 +30,10 @@ Upgrading from v1 or v2: the module path is `github.com/Jul3s7/rest-query-parser
 ## Contributing
 
 Contributions are very welcome, whether it is a bug report, a new feature, a fix, documentation or a fork of yours with something useful in it. Open an issue to discuss an idea or send a pull request directly; please include tests and run `go test ./...` first. If you maintain a fork with features that are missing here, tell me and we will bring them in.
+
+## Support
+
+If this library saves you time and you would like to help keep it maintained, you can support the work on [Ko-fi](https://ko-fi.com/danysz). It is completely optional; code, issues and pull requests are just as valuable.
 
 ## Installation
     go get -u github.com/Jul3s7/rest-query-parser/v3
