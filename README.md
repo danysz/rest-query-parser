@@ -87,7 +87,7 @@ See cmd/main.go and tests for more examples.
 - `date` - date type. Must be specified with tag ":date". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin, is, not` methods. See "Date usage".
 
 ## MongoDB
-Besides SQL the parsed query can be used with MongoDB: `q.MongoQueryFilters()` returns the `bson.M` filter, `q.MongoOrder()` the sort and `q.MongoAddFindOptions(&opts)` sets sort, limit and offset on `options.FindOptions`. `NewParseReplaced(values, validations, rqp.Replacer{...})` parses and renames fields in one call.
+Besides SQL the parsed query can be used with MongoDB: `q.MongoQueryFilters()` returns the `bson.M` filter, `q.MongoOrder()` the sort and `q.MongoAddFindOptions(&opts)` sets sort, limit and offset on `options.FindOptionsBuilder` (driver v2). `NewParseReplaced(values, validations, rqp.Replacer{...})` parses and renames fields in one call.
 
 ## Date usage
 Filters tagged with `:date` accept an absolute date in the layout `2006-01-02` and relative

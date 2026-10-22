@@ -4,16 +4,15 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// setMongoId parses values as primitive.ObjectID (tag ":mongoid")
+// setMongoId parses values as bson.ObjectID (tag ":mongoid")
 func (f *Filter) setMongoId(list []string) error {
-	ids := make([]primitive.ObjectID, len(list))
+	ids := make([]bson.ObjectID, len(list))
 	for i, s := range list {
-		id, err := primitive.ObjectIDFromHex(s)
+		id, err := bson.ObjectIDFromHex(s)
 		if err != nil {
 			return ErrBadFormat
 		}
@@ -57,7 +56,7 @@ func (f *Filter) WhereMongo() (interface{}, error) {
 			pattern += "$"
 		}
 
-		re := primitive.Regex{Pattern: pattern}
+		re := bson.Regex{Pattern: pattern}
 		if f.Method == ILIKE || f.Method == NILIKE {
 			re.Options = "i"
 		}
@@ -139,7 +138,7 @@ func (q *Query) MongoOrder() bson.D {
 }
 
 // MongoAddFindOptions sets sort, limit and offset on the find options
-func (q *Query) MongoAddFindOptions(o *options.FindOptions) {
+func (q *Query) MongoAddFindOptions(o *options.FindOptionsBuilder) {
 	if len(q.Sorts) > 0 {
 		o.SetSort(q.MongoOrder())
 	}

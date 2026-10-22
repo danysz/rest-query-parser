@@ -5,12 +5,11 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func TestMongoQueryFilters(t *testing.T) {
-	id := primitive.NewObjectID()
+	id := bson.NewObjectID()
 	v := Validations{"id:mongoid": nil, "i:int": nil, "s": nil, "limit": nil, "sort": In("i")}
 
 	cases := []struct {
@@ -26,8 +25,8 @@ func TestMongoQueryFilters(t *testing.T) {
 		{"?i[gte]=5", bson.M{"$and": []bson.M{{"i": bson.M{"$gte": 5}}}}, ""},
 		{"?s[is]=NULL", bson.M{"$and": []bson.M{{"s": nil}}}, ""},
 		{"?s[not]=NULL", bson.M{"$and": []bson.M{{"s": bson.M{"$ne": nil}}}}, ""},
-		{"?s[like]=*a*", bson.M{"$and": []bson.M{{"s": bson.M{"$regex": primitive.Regex{Pattern: "a"}}}}}, ""},
-		{"?s[nilike]=a", bson.M{"$and": []bson.M{{"s": bson.M{"$not": primitive.Regex{Pattern: "^a$", Options: "i"}}}}}, ""},
+		{"?s[like]=*a*", bson.M{"$and": []bson.M{{"s": bson.M{"$regex": bson.Regex{Pattern: "a"}}}}}, ""},
+		{"?s[nilike]=a", bson.M{"$and": []bson.M{{"s": bson.M{"$not": bson.Regex{Pattern: "^a$", Options: "i"}}}}}, ""},
 		{"?i=1|i=2", bson.M{"$and": []bson.M{{"$or": []bson.M{{"i": 1}, {"i": 2}}}}}, ""},
 	}
 	for _, c := range cases {
