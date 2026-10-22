@@ -63,6 +63,8 @@ func detectType(name string, validations Validations) string {
 					return "timestamp"
 				case "bool", "b":
 					return "bool"
+				case "intarray", "stringarray", "floatarray":
+					return split[1]
 				case "mongoid":
 					return "mongoid"
 				case "date":
@@ -128,6 +130,12 @@ func newFilter(rawKey string, value string, delimiter string, validations Valida
 func (f *Filter) validate(validate ValidationFunc) error {
 
 	switch f.Value.(type) {
+	case []float64:
+		for _, v := range f.Value.([]float64) {
+			if err := validate(v); err != nil {
+				return err
+			}
+		}
 	case []float32:
 		for _, v := range f.Value.([]float32) {
 			if err := validate(v); err != nil {
@@ -204,7 +212,7 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 
 	var list []string
 
-	if strings.Contains(value, delimiter) && (f.Method == IN || f.Method == NIN || valueType == "int") {
+	if strings.Contains(value, delimiter) && (f.Method == IN || f.Method == NIN || valueType == "int" || isArrayType(valueType)) {
 		list = strings.Split(value, delimiter)
 	} else {
 		list = append(list, value)
@@ -231,6 +239,11 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 		if err != nil {
 			return err
 		}
+	case "intarray", "stringarray", "floatarray":
+		err := f.setArray(list)
+		if err != nil {
+			return err
+		}
 	case "bool":
 		err := f.setBool(list)
 		if err != nil {
@@ -254,6 +267,10 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 // Where returns condition expression. i is the 1-based position used for $i placeholders; i <= 0 gives "?".
 func (f *Filter) Where(i int) (string, error) {
 	var exp string
+
+	if exp, ok := f.whereArray(); ok {
+		return exp, nil
+	}
 
 	switch f.Method {
 	case EQ, NE, GT, LT, GTE, LTE, LIKE, ILIKE, NLIKE, NILIKE:
@@ -313,6 +330,10 @@ func (f *Filter) Where(i int) (string, error) {
 func (f *Filter) Args() ([]interface{}, error) {
 
 	args := make([]interface{}, 0)
+
+	if args, ok := f.argsArray(); ok {
+		return args, nil
+	}
 
 	switch f.Method {
 	case EQ, NE, GT, LT, GTE, LTE:

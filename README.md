@@ -83,6 +83,7 @@ See cmd/main.go and tests for more examples.
 - `float` - float32 type. Must be specified with tag ":float". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin` methods (avoid `eq, ne, in, nin` because of float precision). Validators: `MinFloat, MaxFloat, MinMaxFloat`.
 - `timestamp` - `time.Time` type in RFC3339 format. Must be specified with tag ":timestamp". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin` methods. Validators: `MinTime, MaxTime, MinMaxTime`.
 - `mongoid` - MongoDB ObjectID. Must be specified with tag ":mongoid"; the filter name becomes `_id`. Could be compared by `eq, ne, in, nin` methods.
+- `intarray`, `stringarray`, `floatarray` - PostgreSQL array columns. Must be specified with the tags ":intarray", ":stringarray", ":floatarray". `eq` matches columns holding exactly the given comma separated values (`ids=1,2` -> `(ids @> ARRAY[?,?]::int[] AND ids <@ ARRAY[?,?]::int[])`), `ne` negates it, `is, not` compare to NULL.
 - `bool` - boolean type. Must be specified with tag ":bool". Could be compared by `eq` method.
 - `date` - date type. Must be specified with tag ":date". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin, is, not` methods. See "Date usage".
 
