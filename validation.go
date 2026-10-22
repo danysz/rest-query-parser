@@ -1,6 +1,9 @@
 package rqp
 
 import (
+	"math"
+	"time"
+
 	"github.com/pkg/errors"
 )
 
@@ -91,6 +94,56 @@ func NotEmpty() ValidationFunc {
 			if len(s) > 0 {
 				return nil
 			}
+		}
+		return errors.Wrapf(ErrNotInScope, "%v", value)
+	}
+}
+
+// MinFloat validation if value greater or equal then min
+func MinFloat(min float32) ValidationFunc {
+	return MinMaxFloat(min, float32(math.MaxFloat32))
+}
+
+// MaxFloat validation if value lower or equal then max
+func MaxFloat(max float32) ValidationFunc {
+	return MinMaxFloat(-float32(math.MaxFloat32), max)
+}
+
+// MinMaxFloat validation if value between or equal min and max
+func MinMaxFloat(min, max float32) ValidationFunc {
+	return func(value interface{}) error {
+		if v, ok := value.(float32); ok && min <= v && v <= max {
+			return nil
+		}
+		return errors.Wrapf(ErrNotInScope, "%v", value)
+	}
+}
+
+// MinTime validation if value is not before min
+func MinTime(min time.Time) ValidationFunc {
+	return func(value interface{}) error {
+		if v, ok := value.(time.Time); ok && !v.Before(min) {
+			return nil
+		}
+		return errors.Wrapf(ErrNotInScope, "%v", value)
+	}
+}
+
+// MaxTime validation if value is not after max
+func MaxTime(max time.Time) ValidationFunc {
+	return func(value interface{}) error {
+		if v, ok := value.(time.Time); ok && !v.After(max) {
+			return nil
+		}
+		return errors.Wrapf(ErrNotInScope, "%v", value)
+	}
+}
+
+// MinMaxTime validation if value between or equal min and max
+func MinMaxTime(min, max time.Time) ValidationFunc {
+	return func(value interface{}) error {
+		if v, ok := value.(time.Time); ok && !v.Before(min) && !v.After(max) {
+			return nil
 		}
 		return errors.Wrapf(ErrNotInScope, "%v", value)
 	}

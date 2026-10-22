@@ -2,6 +2,7 @@ package rqp
 
 import (
 	"testing"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -62,4 +63,14 @@ func TestNotEmpty(t *testing.T) {
 	// bad case
 	err = NotEmpty()("")
 	assert.Equal(t, errors.Cause(err), ErrNotInScope)
+}
+
+func TestFloatTimeValidators(t *testing.T) {
+	assert.NoError(t, MinMaxFloat(1, 2)(float32(1.5)))
+	assert.Error(t, MinFloat(2)(float32(1.5)))
+	assert.Error(t, MaxFloat(1)(float32(1.5)))
+	now := time.Now()
+	assert.NoError(t, MinMaxTime(now.Add(-time.Hour), now.Add(time.Hour))(now))
+	assert.Error(t, MinTime(now.Add(time.Hour))(now))
+	assert.Error(t, MaxTime(now.Add(-time.Hour))(now))
 }

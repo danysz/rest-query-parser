@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type StateOR byte
@@ -21,7 +22,7 @@ type Filter struct {
 	Name      string // name of filter, takes from Key (eg. "id")
 	Method    Method // compare method, takes from Key (eg. EQ)
 	Value     interface{}
-	ValueType string // type of Value, can be "int", "bool", "date" or "string"
+	ValueType string // type of Value, can be "int", "float", "timestamp", "bool", "date" or "string"
 	OR        StateOR
 
 	UseNamedField bool
@@ -56,6 +57,10 @@ func detectType(name string, validations Validations) string {
 				switch split[1] {
 				case "int", "i":
 					return "int"
+				case "float", "f":
+					return "float"
+				case "timestamp", "t":
+					return "timestamp"
 				case "bool", "b":
 					return "bool"
 				case "date":
@@ -117,6 +122,18 @@ func newFilter(rawKey string, value string, delimiter string, validations Valida
 func (f *Filter) validate(validate ValidationFunc) error {
 
 	switch f.Value.(type) {
+	case []float32:
+		for _, v := range f.Value.([]float32) {
+			if err := validate(v); err != nil {
+				return err
+			}
+		}
+	case []time.Time:
+		for _, v := range f.Value.([]time.Time) {
+			if err := validate(v); err != nil {
+				return err
+			}
+		}
 	case []int:
 		for _, v := range f.Value.([]int) {
 			err := validate(v)
@@ -131,7 +148,7 @@ func (f *Filter) validate(validate ValidationFunc) error {
 				return err
 			}
 		}
-	case int, bool, string:
+	case int, float32, time.Time, bool, string:
 		// Skip validation for NULL values as they are handled specially
 		if IsNullOrEmpty(f.Value) {
 			return nil
@@ -190,6 +207,16 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 	switch valueType {
 	case "int":
 		err := f.setInt(list)
+		if err != nil {
+			return err
+		}
+	case "float":
+		err := f.setFloat(list)
+		if err != nil {
+			return err
+		}
+	case "timestamp":
+		err := f.setTimestamp(list)
 		if err != nil {
 			return err
 		}
@@ -305,6 +332,65 @@ func (f *Filter) Args() ([]interface{}, error) {
 	default:
 		return nil, ErrUnknownMethod
 	}
+}
+
+func (f *Filter) setFloat(list []string) error {
+	if len(list) == 1 {
+		switch f.Method {
+		case EQ, NE, GT, LT, GTE, LTE, IN, NIN:
+			v, err := strconv.ParseFloat(list[0], 32)
+			if err != nil {
+				return ErrBadFormat
+			}
+			f.Value = float32(v)
+			return nil
+		default:
+			return ErrMethodNotAllowed
+		}
+	}
+	if f.Method != IN && f.Method != NIN {
+		return ErrMethodNotAllowed
+	}
+	floats := make([]float32, len(list))
+	for i, s := range list {
+		v, err := strconv.ParseFloat(s, 32)
+		if err != nil {
+			return ErrBadFormat
+		}
+		floats[i] = float32(v)
+	}
+	f.Value = floats
+	return nil
+}
+
+// setTimestamp parses RFC3339 values into time.Time
+func (f *Filter) setTimestamp(list []string) error {
+	if len(list) == 1 {
+		switch f.Method {
+		case EQ, NE, GT, LT, GTE, LTE, IN, NIN:
+			v, err := time.Parse(time.RFC3339, list[0])
+			if err != nil {
+				return ErrBadFormat
+			}
+			f.Value = v
+			return nil
+		default:
+			return ErrMethodNotAllowed
+		}
+	}
+	if f.Method != IN && f.Method != NIN {
+		return ErrMethodNotAllowed
+	}
+	times := make([]time.Time, len(list))
+	for i, s := range list {
+		v, err := time.Parse(time.RFC3339, s)
+		if err != nil {
+			return ErrBadFormat
+		}
+		times[i] = v
+	}
+	f.Value = times
+	return nil
 }
 
 func (f *Filter) setInt(list []string) error {

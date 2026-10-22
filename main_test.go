@@ -224,6 +224,17 @@ func TestWhere(t *testing.T) {
 		{url: "?id[in]=100,200", err: "id[in]: can't be greater then 10"},
 		{url: "?id[nin]=100,200", err: "id[nin]: can't be greater then 10"},
 
+		// float:
+		{url: "?f[gte]=1.5", expected: " WHERE f >= ?"},
+		{url: "?f[in]=1.5,2.5", expected: " WHERE f IN (?, ?)"},
+		{url: "?f=abc", err: "f: bad format"},
+		{url: "?f[gt]=9.5", err: "f[gt]: can't be greater then 8.5"},
+		{url: "?f[like]=1.5", err: "f[like]: method are not allowed"},
+		// timestamp:
+		{url: "?t[gte]=2020-01-01T00:00:00Z", expected: " WHERE t >= ?"},
+		{url: "?t[in]=2020-01-01T00:00:00Z,2020-01-02T00:00:00Z", expected: " WHERE t IN (?, ?)"},
+		{url: "?t=2020-01-01", err: "t: bad format"},
+
 		// not like, not ilike:
 		{url: "?u[nlike]=superman", expected: " WHERE u NOT LIKE ?"},
 		{url: "?u[nilike]=superman", expected: " WHERE u NOT ILIKE ?"},
@@ -294,6 +305,13 @@ func TestWhere(t *testing.T) {
 				),
 				"u:string": nil,
 				"b:bool":   nil,
+				"f:float": func(value interface{}) error {
+					if value.(float32) > 8.5 {
+						return errors.New("can't be greater then 8.5")
+					}
+					return nil
+				},
+				"t:timestamp": nil,
 				"custom": func(value interface{}) error {
 					return nil
 				},

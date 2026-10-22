@@ -80,6 +80,8 @@ See cmd/main.go and tests for more examples.
 ## Supported types
 - `string` - the default type for all provided filters if not specified another. Could be compared by `eq, ne, gt, lt, gte, lte, like, ilike, nlike, nilike, in, nin, is, not` methods (`nlike, nilike` means `NOT LIKE, NOT ILIKE` respectively, `in, nin` means `IN, NOT IN` respectively, `is, not` for comparison to NULL `IS NULL, IS NOT NULL`).
 - `int` - integer type. Must be specified with tag ":int". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin, is, not` methods.
+- `float` - float32 type. Must be specified with tag ":float". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin` methods (avoid `eq, ne, in, nin` because of float precision). Validators: `MinFloat, MaxFloat, MinMaxFloat`.
+- `timestamp` - `time.Time` type in RFC3339 format. Must be specified with tag ":timestamp". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin` methods. Validators: `MinTime, MaxTime, MinMaxTime`.
 - `bool` - boolean type. Must be specified with tag ":bool". Could be compared by `eq` method.
 - `date` - date type. Must be specified with tag ":date". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin, is, not` methods. See "Date usage".
 
