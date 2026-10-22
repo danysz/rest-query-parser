@@ -724,8 +724,14 @@ func (q *Query) requiredNames() map[string]bool {
 func (q *Query) parseFilter(key, value string) error {
 	value = strings.TrimSpace(value)
 
+	// Only reject truly empty parameters (not quoted empty strings)
 	if len(value) == 0 {
 		return errors.Wrap(ErrEmptyValue, key)
+	}
+
+	// Handle quoted empty strings - convert to actual empty string
+	if value == `""` || value == `''` {
+		value = ""
 	}
 
 	if strings.Contains(value, q.delimiterOR) { // OR multiple filter

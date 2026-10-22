@@ -178,7 +178,7 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 
 	var list []string
 
-	if strings.Contains(value, delimiter) && (f.Method == IN || f.Method == NIN) {
+	if strings.Contains(value, delimiter) && (f.Method == IN || f.Method == NIN || valueType == "int") {
 		list = strings.Split(value, delimiter)
 	} else {
 		list = append(list, value)
@@ -307,6 +307,7 @@ func (f *Filter) setInt(list []string) error {
 				return ErrBadFormat
 			}
 			f.Value = i
+			return nil
 		case IS, NOT:
 			if IsNullOrEmpty(strings.ToUpper(list[0])) {
 				// We do handle all variants as null
@@ -318,20 +319,23 @@ func (f *Filter) setInt(list []string) error {
 			return ErrMethodNotAllowed
 		}
 	} else {
-		if f.Method != IN && f.Method != NIN {
+		// Handle multiple values (IN/NIN)
+		switch f.Method {
+		case IN, NIN:
+			intSlice := make([]int, len(list))
+			for i, v := range list {
+				val, err := strconv.Atoi(v)
+				if err != nil {
+					return ErrBadFormat
+				}
+				intSlice[i] = val
+			}
+			f.Value = intSlice
+			return nil
+		default:
 			return ErrMethodNotAllowed
 		}
-		intSlice := make([]int, len(list))
-		for i, s := range list {
-			v, err := strconv.Atoi(s)
-			if err != nil {
-				return ErrBadFormat
-			}
-			intSlice[i] = v
-		}
-		f.Value = intSlice
 	}
-	return nil
 }
 
 func (f *Filter) setBool(list []string) error {
@@ -419,15 +423,17 @@ func (f *Filter) setString(list []string) error {
 				}
 				return nil
 			}
-			return ErrBadFormat
 		default:
 			return ErrMethodNotAllowed
 		}
 	} else {
+		// Handle multiple values (IN/NIN)
 		switch f.Method {
 		case IN, NIN:
 			f.Value = list
 			return nil
+		default:
+			return ErrBadFormat
 		}
 	}
 	return ErrMethodNotAllowed

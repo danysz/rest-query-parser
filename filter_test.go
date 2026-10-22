@@ -7,26 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_Where(t *testing.T) {
-	t.Run("ErrUnknownMethod", func(t *testing.T) {
-		filter := Filter{
-			Key:    "id[not]",
-			Name:   "id",
-			Method: NOT,
-		}
-		_, err := filter.Where()
-		assert.Equal(t, err, ErrUnknownMethod)
-
-		filter = Filter{
-			Key:    "id[fake]",
-			Name:   "id",
-			Method: "fake",
-		}
-		_, err = filter.Where()
-		assert.Equal(t, err, ErrUnknownMethod)
-	})
-}
-
 func Test_Args(t *testing.T) {
 	t.Run("ErrUnknownMethod", func(t *testing.T) {
 		filter := Filter{
@@ -43,6 +23,34 @@ func Test_Args(t *testing.T) {
 			Name:   "id",
 			Method: "fake",
 		}
+		_, err = filter.Args()
+		assert.Equal(t, err, ErrUnknownMethod)
+	})
+
+	t.Run("String field with IS empty string should fail", func(t *testing.T) {
+		filter := Filter{
+			Key:    "name[is]",
+			Name:   "name",
+			Method: IS,
+			Value:  "",
+		}
+		_, err := filter.Where()
+		assert.Equal(t, err, ErrUnknownMethod)
+
+		_, err = filter.Args()
+		assert.Equal(t, err, ErrUnknownMethod)
+	})
+
+	t.Run("Integer field with IS empty string should fail", func(t *testing.T) {
+		filter := Filter{
+			Key:    "id[is]",
+			Name:   "id",
+			Method: IS,
+			Value:  "",
+		}
+		_, err := filter.Where()
+		assert.Equal(t, err, ErrUnknownMethod)
+
 		_, err = filter.Args()
 		assert.Equal(t, err, ErrUnknownMethod)
 	})

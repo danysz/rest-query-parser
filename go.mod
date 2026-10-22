@@ -1,4 +1,4 @@
-module github.com/timsolov/rest-query-parser
+module github.com/Jul3s7/rest-query-parser
 
 go 1.13
 

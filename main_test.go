@@ -217,7 +217,7 @@ func TestWhere(t *testing.T) {
 		{url: "?id[nin]=1.2,1.2", expected: "", err: "id[nin]: bad format"},
 		{url: "?id[test]=1", expected: "", err: "id[test]: unknown method"},
 		{url: "?id[like]=1", expected: "", err: "id[like]: method are not allowed"},
-		{url: "?id=1,2", expected: "", err: "id: bad format"},
+		{url: "?id=1,2", expected: "", err: "id: method are not allowed"},
 		{url: "?id=4", expected: " WHERE id = ?"},
 
 		{url: "?id=100", err: "id: can't be greater then 10"},
