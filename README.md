@@ -10,6 +10,26 @@ Query Parser is a library for easy building dynamic SQL queries to Database. It 
 
 
 
+## Maintained fork, v2
+
+As of 2026-10-22 this repository brings together the features of the forks of [timsolov/rest-query-parser](https://github.com/timsolov/rest-query-parser) that I could find, in one place that is actively maintained. Only functionality that adds something new was taken; duplicates and incompatible rewrites were left out.
+
+| Feature | Origin |
+|---|---|
+| `date` type with relative values, `null`/`empty`/`nullorempty` filters | [gerricom](https://github.com/gerricom/rest-query-parser), [Jul3s7](https://github.com/Jul3s7/rest-query-parser) |
+| `$1, $2...` and `:name` placeholders (`UsePositionalArgs`, `UseNamedFields`) | [qrs-source](https://github.com/qrs-source/rest-query-parser) |
+| `float` and `timestamp` types with `MinFloat`/`MaxTime`... validators | [rayhankinan](https://github.com/rayhankinan/rest-query-parser) |
+| MongoDB output (`mongoid` type, `MongoQueryFilters`, `MongoOrder`...), driver v2 | [craimbault](https://github.com/craimbault/go-rqp-mongo) |
+| PostgreSQL array filters (`intarray`, `stringarray`, `floatarray`) | [nfidel](https://github.com/nfidel/rest-query-parser) |
+
+Thank you to all the authors of these forks, and to Tim Solovyov for the original library.
+
+Upgrading from v1: the module path is `github.com/Jul3s7/rest-query-parser/v2`, Go 1.25 or newer is required, `Filter.Where` takes a placeholder index (`0` keeps `?`), and `MongoAddFindOptions` takes `*options.FindOptionsBuilder`.
+
+## Contributing
+
+Contributions are very welcome, whether it is a bug report, a new feature, a fix, documentation or a fork of yours with something useful in it. Open an issue to discuss an idea or send a pull request directly; please include tests and run `go test ./...` first. If you maintain a fork with features that are missing here, tell me and we will bring them in.
+
 ## Installation
     go get -u github.com/Jul3s7/rest-query-parser/v2
 
