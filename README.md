@@ -35,6 +35,8 @@ Contributions are very welcome, whether it is a bug report, a new feature, a fix
 
 If this library saves you time and you would like to help keep it maintained, you can support the work on [Ko-fi](https://ko-fi.com/danysz). It is completely optional; code, issues and pull requests are just as valuable.
 
+<a href="https://ko-fi.com/danysz" target="_blank"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi3.png?v=3" border="0" alt="Buy Me a Coffee at ko-fi.com" /></a>
+
 ## Installation
     go get -u github.com/Jul3s7/rest-query-parser/v3
 
