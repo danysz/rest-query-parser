@@ -82,8 +82,12 @@ See cmd/main.go and tests for more examples.
 - `int` - integer type. Must be specified with tag ":int". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin, is, not` methods.
 - `float` - float32 type. Must be specified with tag ":float". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin` methods (avoid `eq, ne, in, nin` because of float precision). Validators: `MinFloat, MaxFloat, MinMaxFloat`.
 - `timestamp` - `time.Time` type in RFC3339 format. Must be specified with tag ":timestamp". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin` methods. Validators: `MinTime, MaxTime, MinMaxTime`.
+- `mongoid` - MongoDB ObjectID. Must be specified with tag ":mongoid"; the filter name becomes `_id`. Could be compared by `eq, ne, in, nin` methods.
 - `bool` - boolean type. Must be specified with tag ":bool". Could be compared by `eq` method.
 - `date` - date type. Must be specified with tag ":date". Could be compared by `eq, ne, gt, lt, gte, lte, in, nin, is, not` methods. See "Date usage".
+
+## MongoDB
+Besides SQL the parsed query can be used with MongoDB: `q.MongoQueryFilters()` returns the `bson.M` filter, `q.MongoOrder()` the sort and `q.MongoAddFindOptions(&opts)` sets sort, limit and offset on `options.FindOptions`. `NewParseReplaced(values, validations, rqp.Replacer{...})` parses and renames fields in one call.
 
 ## Date usage
 Filters tagged with `:date` accept an absolute date in the layout `2006-01-02` and relative

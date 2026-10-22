@@ -635,6 +635,15 @@ func NewParse(q url.Values, v Validations) (*Query, error) {
 	return query, query.Parse()
 }
 
+// NewParseReplaced creates new Query instance, Parse it and replace names
+func NewParseReplaced(q url.Values, v Validations, r Replacer) (*Query, error) {
+	query, err := NewParse(q, v)
+	if err == nil {
+		query.ReplaceNames(r)
+	}
+	return query, err
+}
+
 // Parse parses the query of URL
 // as query you can use standart http.Request query by r.URL.Query()
 func (q *Query) Parse() (err error) {

@@ -63,6 +63,8 @@ func detectType(name string, validations Validations) string {
 					return "timestamp"
 				case "bool", "b":
 					return "bool"
+				case "mongoid":
+					return "mongoid"
 				case "date":
 					return "date"
 				default:
@@ -104,6 +106,10 @@ func newFilter(rawKey string, value string, delimiter string, validations Valida
 
 	// detect type by key names in validations
 	valueType := detectType(f.Name, validations)
+
+	if valueType == "mongoid" {
+		f.Name = "_id"
+	}
 	f.ValueType = valueType
 
 	if err := f.parseValue(valueType, value, delimiter); err != nil {
@@ -217,6 +223,11 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 		}
 	case "timestamp":
 		err := f.setTimestamp(list)
+		if err != nil {
+			return err
+		}
+	case "mongoid":
+		err := f.setMongoId(list)
 		if err != nil {
 			return err
 		}
