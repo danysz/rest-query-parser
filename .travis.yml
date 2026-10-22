@@ -1,8 +1,8 @@
 language: go
 sudo: false
 go:
-- 1.13.x
-go_import_path: github.com/timsolov/rest-query-parser
+- 1.21.x
+go_import_path: github.com/qrs-source/rest-query-parser
 install:
 - go get -t -v ./...
 - go get -u honnef.co/go/tools/cmd/staticcheck

@@ -2,7 +2,7 @@
 
 <a href="https://awesome-go.com/"><img align="right" src="https://github.com/avelino/awesome-go/raw/main/tmpl/assets/logo.png" alt="awesome-go" title="awesome-go" /></a>
 
-[![GoDoc](https://godoc.org/github.com/timsolov/rest-query-parser?status.png)](https://godoc.org/github.com/timsolov/rest-query-parser)
+[![GoDoc](https://godoc.org/github.com/qrs-source/rest-query-parser?status.png)](https://godoc.org/github.com/qrs-source/rest-query-parser)
 [![Coverage Status](https://coveralls.io/repos/github/timsolov/rest-query-parser/badge.svg?branch=master)](https://coveralls.io/github/timsolov/rest-query-parser?branch=master)
 [![Awesome](https://cdn.rawgit.com/sindresorhus/awesome/d7305f38d29fed78fa85652e3a63e154dd8e8829/media/badge.svg)](https://github.com/sindresorhus/awesome)
 
@@ -11,7 +11,7 @@ Query Parser is a library for easy building dynamic SQL queries to Database. It 
 
 
 ## Installation
-    go get -u github.com/timsolov/rest-query-parser
+    go get -u github.com/qrs-source/rest-query-parser
 
 ## Idea
 
@@ -31,7 +31,7 @@ See cmd/main.go and tests for more examples.
         "fmt"
         "net/url"
     
-        rqp "github.com/timsolov/rest-query-parser"
+        rqp "github.com/qrs-source/rest-query-parser"
     )
     
     func main() {

@@ -140,12 +140,12 @@ func Test_DateFilter(t *testing.T) {
 	}
 
 	t.Run("relative value is resolved", func(t *testing.T) {
-		filter, err := newFilter("created_at[gte]", "-90d", ",", validations)
+		filter, err := newFilter("created_at[gte]", "-90d", ",", validations, false)
 		assert.NoError(t, err)
 		assert.Equal(t, "date", filter.ValueType)
 		assert.Equal(t, "2026-05-21", filter.Value)
 
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "created_at >= ?", where)
 
@@ -155,17 +155,17 @@ func Test_DateFilter(t *testing.T) {
 	})
 
 	t.Run("absolute value is normalized", func(t *testing.T) {
-		filter, err := newFilter("created_at", "2020-10-02", ",", validations)
+		filter, err := newFilter("created_at", "2020-10-02", ",", validations, false)
 		assert.NoError(t, err)
 		assert.Equal(t, "2020-10-02", filter.Value)
 	})
 
 	t.Run("list values", func(t *testing.T) {
-		filter, err := newFilter("created_at[in]", "today,-1d,2020-10-02", ",", validations)
+		filter, err := newFilter("created_at[in]", "today,-1d,2020-10-02", ",", validations, false)
 		assert.NoError(t, err)
 		assert.Equal(t, []string{"2026-08-19", "2026-08-18", "2020-10-02"}, filter.Value)
 
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "created_at IN (?, ?, ?)", where)
 
@@ -182,37 +182,37 @@ func Test_DateFilter(t *testing.T) {
 		}
 
 		for value, expected := range tests {
-			filter, err := newFilter("created_at[is]", value, ",", validations)
+			filter, err := newFilter("created_at[is]", value, ",", validations, false)
 			assert.NoError(t, err, value)
 
-			where, err := filter.Where()
+			where, err := filter.Where(0)
 			assert.NoError(t, err, value)
 			assert.Equal(t, expected, where, value)
 		}
 
-		filter, err := newFilter("created_at[not]", "null", ",", validations)
+		filter, err := newFilter("created_at[not]", "null", ",", validations, false)
 		assert.NoError(t, err)
 
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "created_at IS NOT NULL", where)
 	})
 
 	t.Run("errors", func(t *testing.T) {
-		_, err := newFilter("created_at[gte]", "-90x", ",", validations)
+		_, err := newFilter("created_at[gte]", "-90x", ",", validations, false)
 		assert.Equal(t, ErrBadFormat, err)
 
-		_, err = newFilter("created_at[in]", "-90d,broken", ",", validations)
+		_, err = newFilter("created_at[in]", "-90d,broken", ",", validations, false)
 		assert.Equal(t, ErrBadFormat, err)
 
-		_, err = newFilter("created_at[is]", "-90d", ",", validations)
+		_, err = newFilter("created_at[is]", "-90d", ",", validations, false)
 		assert.Equal(t, ErrBadFormat, err)
 
-		_, err = newFilter("created_at[like]", "-90d", ",", validations)
+		_, err = newFilter("created_at[like]", "-90d", ",", validations, false)
 		assert.Equal(t, ErrMethodNotAllowed, err)
 
 		// a delimited value is only split for IN/NIN, so it stays one bad date
-		_, err = newFilter("created_at[gte]", "-90d,-80d", ",", validations)
+		_, err = newFilter("created_at[gte]", "-90d,-80d", ",", validations, false)
 		assert.Equal(t, ErrBadFormat, err)
 
 		filter := &Filter{Name: "created_at", Method: GTE}

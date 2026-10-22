@@ -677,3 +677,10 @@ func QueryEqual(t *testing.T, q, got *Query) {
 		t.Errorf("q.Filters = %v , want = %v", got.Filters, q.Filters)
 	}
 }
+
+func TestUsePositionalArgs(t *testing.T) {
+	q := NewQV(url.Values{"id[gt]": {"1"}}, Validations{"id:int": nil, "u": nil})
+	q.UsePositionalArgs(true)
+	assert.NoError(t, q.Parse())
+	assert.Equal(t, " WHERE id > $1", q.WHERE())
+}

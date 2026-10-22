@@ -23,6 +23,8 @@ type Filter struct {
 	Value     interface{}
 	ValueType string // type of Value, can be "int", "bool", "date" or "string"
 	OR        StateOR
+
+	UseNamedField bool
 }
 
 // detectValidation
@@ -78,9 +80,10 @@ func isNotNull(f *Filter) bool {
 
 // rawKey - url key
 // value - must be one value (if need IN method then values must be separated by comma (,))
-func newFilter(rawKey string, value string, delimiter string, validations Validations) (*Filter, error) {
+func newFilter(rawKey string, value string, delimiter string, validations Validations, useNamedFields bool) (*Filter, error) {
 	f := &Filter{
-		Key: rawKey,
+		Key:           rawKey,
+		UseNamedField: useNamedFields,
 	}
 
 	// set Key, Name, Method
@@ -210,13 +213,19 @@ func (f *Filter) parseValue(valueType string, value string, delimiter string) er
 	return nil
 }
 
-// Where returns condition expression
-func (f *Filter) Where() (string, error) {
+// Where returns condition expression. i is the 1-based position used for $i placeholders; i <= 0 gives "?".
+func (f *Filter) Where(i int) (string, error) {
 	var exp string
 
 	switch f.Method {
 	case EQ, NE, GT, LT, GTE, LTE, LIKE, ILIKE, NLIKE, NILIKE:
-		exp = fmt.Sprintf("%s %s ?", f.Name, translateMethods[f.Method])
+		if f.UseNamedField {
+			exp = fmt.Sprintf("%s %s :%s", f.Name, translateMethods[f.Method], f.Name)
+		} else if i > 0 {
+			exp = fmt.Sprintf("%s %s $%d", f.Name, translateMethods[f.Method], i)
+		} else {
+			exp = fmt.Sprintf("%s %s ?", f.Name, translateMethods[f.Method])
+		}
 		return exp, nil
 	case IS, NOT:
 		if !IsNullOrEmpty(f.Value) {

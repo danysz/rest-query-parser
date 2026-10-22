@@ -7,6 +7,26 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func Test_Where(t *testing.T) {
+	t.Run("ErrUnknownMethod", func(t *testing.T) {
+		filter := Filter{
+			Key:    "id[not]",
+			Name:   "id",
+			Method: NOT,
+		}
+		_, err := filter.Where(1)
+		assert.Equal(t, err, ErrUnknownMethod)
+
+		filter = Filter{
+			Key:    "id[fake]",
+			Name:   "id",
+			Method: "fake",
+		}
+		_, err = filter.Where(1)
+		assert.Equal(t, err, ErrUnknownMethod)
+	})
+}
+
 func Test_Args(t *testing.T) {
 	t.Run("ErrUnknownMethod", func(t *testing.T) {
 		filter := Filter{
@@ -34,7 +54,7 @@ func Test_Args(t *testing.T) {
 			Method: IS,
 			Value:  "",
 		}
-		_, err := filter.Where()
+		_, err := filter.Where(0)
 		assert.Equal(t, err, ErrUnknownMethod)
 
 		_, err = filter.Args()
@@ -48,7 +68,7 @@ func Test_Args(t *testing.T) {
 			Method: IS,
 			Value:  "",
 		}
-		_, err := filter.Where()
+		_, err := filter.Where(0)
 		assert.Equal(t, err, ErrUnknownMethod)
 
 		_, err = filter.Args()
@@ -64,7 +84,7 @@ func Test_NullIntegerHandling(t *testing.T) {
 			Method: IS,
 			Value:  NULL,
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "id IS NULL", where)
 
@@ -80,7 +100,7 @@ func Test_NullIntegerHandling(t *testing.T) {
 			Method: NOT,
 			Value:  NULL,
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "id IS NOT NULL", where)
 
@@ -96,7 +116,7 @@ func Test_NullIntegerHandling(t *testing.T) {
 			Method: IS,
 			Value:  123,
 		}
-		_, err := filter.Where()
+		_, err := filter.Where(0)
 		assert.Equal(t, err, ErrUnknownMethod)
 
 		_, err = filter.Args()
@@ -110,7 +130,7 @@ func Test_NullIntegerHandling(t *testing.T) {
 			Method: NOT,
 			Value:  123,
 		}
-		_, err := filter.Where()
+		_, err := filter.Where(0)
 		assert.Equal(t, err, ErrUnknownMethod)
 
 		_, err = filter.Args()
@@ -124,14 +144,14 @@ func Test_IntegerNullParsing(t *testing.T) {
 	}
 
 	t.Run("Parse color_id[is]=null from URL", func(t *testing.T) {
-		filter, err := newFilter("color_id[is]", "null", ",", validations)
+		filter, err := newFilter("color_id[is]", "null", ",", validations, false)
 		assert.NoError(t, err)
 		assert.Equal(t, "color_id[is]", filter.Key)
 		assert.Equal(t, "color_id", filter.Name)
 		assert.Equal(t, IS, filter.Method)
 		assert.Equal(t, NULL, filter.Value)
 
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "color_id IS NULL", where)
 
@@ -141,14 +161,14 @@ func Test_IntegerNullParsing(t *testing.T) {
 	})
 
 	t.Run("Parse color_id[not]=NULL from URL", func(t *testing.T) {
-		filter, err := newFilter("color_id[not]", "NULL", ",", validations)
+		filter, err := newFilter("color_id[not]", "NULL", ",", validations, false)
 		assert.NoError(t, err)
 		assert.Equal(t, "color_id[not]", filter.Key)
 		assert.Equal(t, "color_id", filter.Name)
 		assert.Equal(t, NOT, filter.Method)
 		assert.Equal(t, NULL, filter.Value)
 
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "color_id IS NOT NULL", where)
 
@@ -158,14 +178,14 @@ func Test_IntegerNullParsing(t *testing.T) {
 	})
 
 	t.Run("Parse color_id[eq]=123 still works", func(t *testing.T) {
-		filter, err := newFilter("color_id[eq]", "123", ",", validations)
+		filter, err := newFilter("color_id[eq]", "123", ",", validations, false)
 		assert.NoError(t, err)
 		assert.Equal(t, "color_id[eq]", filter.Key)
 		assert.Equal(t, "color_id", filter.Name)
 		assert.Equal(t, EQ, filter.Method)
 		assert.Equal(t, 123, filter.Value)
 
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "color_id = ?", where)
 
@@ -183,7 +203,7 @@ func Test_EmptyStringHandling(t *testing.T) {
 			Method: EQ,
 			Value:  "",
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "name = ?", where)
 
@@ -199,7 +219,7 @@ func Test_EmptyStringHandling(t *testing.T) {
 			Method: NE,
 			Value:  "",
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "name != ?", where)
 
@@ -215,7 +235,7 @@ func Test_EmptyStringHandling(t *testing.T) {
 			Method: LIKE,
 			Value:  "",
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "name LIKE ?", where)
 
@@ -231,7 +251,7 @@ func Test_EmptyStringHandling(t *testing.T) {
 			Method: ILIKE,
 			Value:  "",
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "name ILIKE ?", where)
 
@@ -247,7 +267,7 @@ func Test_EmptyStringHandling(t *testing.T) {
 			Method: IN,
 			Value:  []string{"", "test", ""},
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "name IN (?, ?, ?)", where)
 
@@ -263,7 +283,7 @@ func Test_EmptyStringHandling(t *testing.T) {
 			Method: NIN,
 			Value:  []string{"", "excluded"},
 		}
-		where, err := filter.Where()
+		where, err := filter.Where(0)
 		assert.NoError(t, err)
 		assert.Equal(t, "name NOT IN (?, ?)", where)
 
